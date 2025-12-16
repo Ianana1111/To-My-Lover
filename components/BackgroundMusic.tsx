@@ -4,7 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import { Music, VolumeX } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export default function BackgroundMusic() {
+interface BackgroundMusicProps {
+    shouldPlay?: boolean;
+}
+
+export default function BackgroundMusic({ shouldPlay = false }: BackgroundMusicProps) {
     const audioRef = useRef<HTMLAudioElement | null>(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [hasInteracted, setHasInteracted] = useState(false);
@@ -12,13 +16,27 @@ export default function BackgroundMusic() {
     const [error, setError] = useState(false);
 
     useEffect(() => {
+        // Trigger from External Prop (Envelope Click)
+        if (shouldPlay && audioRef.current && !isPlaying && !error) {
+            audioRef.current.volume = 0.2;
+            audioRef.current.play()
+                .then(() => setIsPlaying(true))
+                .catch((err) => console.log("External play blocked:", err));
+        }
+    }, [shouldPlay, isPlaying, error]);
+
+    useEffect(() => {
         // Attempt auto-play on mount (often blocked by browser)
         const playAudio = async () => {
             if (audioRef.current && !error) {
                 try {
                     audioRef.current.volume = 0.2;
-                    await audioRef.current.play();
-                    setIsPlaying(true);
+                    // Only auto-play if explicitly told to or via standard autoplay attribute (if we wanted that)
+                    // Here we rely on 'shouldPlay' mostly.
+                    if (shouldPlay) {
+                        await audioRef.current.play();
+                        setIsPlaying(true);
+                    }
                 } catch (err) {
                     console.log("Auto-play blocked, waiting for interaction");
                 }
@@ -28,7 +46,7 @@ export default function BackgroundMusic() {
 
         // Add global interaction listener to start music if muted
         const handleInteraction = () => {
-            if (!hasInteracted && audioRef.current && audioRef.current.paused && !error) {
+            if (!hasInteracted && audioRef.current && audioRef.current.paused && !error && shouldPlay) {
                 audioRef.current.play()
                     .then(() => setIsPlaying(true))
                     .catch(() => { });
@@ -48,7 +66,7 @@ export default function BackgroundMusic() {
             window.removeEventListener('keydown', handleInteraction);
             window.removeEventListener('touchstart', handleInteraction);
         };
-    }, [hasInteracted, error]);
+    }, [hasInteracted, error, shouldPlay]);
 
     const togglePlay = () => {
         if (audioRef.current && !error) {
@@ -64,31 +82,15 @@ export default function BackgroundMusic() {
     if (error) return null;
 
     return (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-4">
-            {!isPlaying && (
-                <div className="animate-bounce bg-white/90 text-foreground px-3 py-1 rounded-full text-sm font-serif shadow-md border border-accent/20">
-                    按我
-                </div>
-            )}
-            <audio
-                ref={audioRef}
-                src="/audio.mp3"
-                loop
-                onError={() => {
-                    console.error("Audio file not found: /audio.mp3");
-                    setError(true);
-                }}
-                className="hidden"
-            />
-            <button
-                onClick={togglePlay}
-                className={cn(
-                    "bg-white/80 backdrop-blur-sm p-3 rounded-full shadow-lg transition-all hover:scale-110 active:scale-95 border border-accent/20",
-                    isPlaying ? "text-accent animate-spin-slow" : "text-gray-400"
-                )}
-            >
-                {isPlaying ? <Music size={24} /> : <VolumeX size={24} />}
-            </button>
-        </div>
+        <audio
+            ref={audioRef}
+            src="/audio.mp3"
+            loop
+            onError={() => {
+                console.error("Audio file not found: /audio.mp3");
+                setError(true);
+            }}
+            className="hidden"
+        />
     );
 }

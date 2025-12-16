@@ -6,9 +6,28 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { Volume2, VolumeX } from "lucide-react";
 
+// Update ParallaxGallery to support object array and add hover effects.
+
+// 1. Update Interface
+interface GalleryItem {
+    src: string;
+    caption?: string;
+    type?: 'image' | 'video'; // optional, can infer from src extension
+}
+
 interface ParallaxGalleryProps {
-    images: string[];
+    images: (string | GalleryItem)[]; // Support both for backward compatibility
     className?: string;
+}
+
+// 2. Helper to normalize
+function normalizeImages(images: (string | GalleryItem)[]): GalleryItem[] {
+    return images.map(img => {
+        if (typeof img === 'string') {
+            return { src: img };
+        }
+        return img;
+    });
 }
 
 export default function ParallaxGallery({ images, className }: ParallaxGalleryProps) {
@@ -18,13 +37,15 @@ export default function ParallaxGallery({ images, className }: ParallaxGalleryPr
         offset: ["start end", "end start"],
     });
 
+    const normalizedImages = normalizeImages(images);
+
     // Use springs for smooth following
     const springConfig = { stiffness: 100, damping: 30, restDelta: 0.001 };
 
     // Split images into 3 columns
-    const col1 = images.filter((_, i) => i % 3 === 0);
-    const col2 = images.filter((_, i) => i % 3 === 1);
-    const col3 = images.filter((_, i) => i % 3 === 2);
+    const col1 = normalizedImages.filter((_, i) => i % 3 === 0);
+    const col2 = normalizedImages.filter((_, i) => i % 3 === 1);
+    const col3 = normalizedImages.filter((_, i) => i % 3 === 2);
 
     // Parallax transforms
     // Column 1 moves faster (upwards)
@@ -50,30 +71,67 @@ export default function ParallaxGallery({ images, className }: ParallaxGalleryPr
     );
 }
 
-
-function Column({ images, y, className }: { images: string[]; y: any, className?: string }) {
+function Column({ images, y, className }: { images: GalleryItem[]; y: any, className?: string }) {
     return (
         <motion.div style={{ y }} className={cn("flex flex-col gap-6", className)}>
-            {images.map((src, idx) => {
-                const isVideo = src.toLowerCase().endsWith(".mp4");
-                return (
-                    <div key={idx} className="relative rounded-sm overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-500 w-full">
-                        {isVideo ? (
-                            <VideoItem src={src} />
-                        ) : (
-                            <div className="relative aspect-[3/4]">
-                                <Image
-                                    src={src}
-                                    alt="Memory"
-                                    fill
-                                    className="object-cover hover:scale-105 transition-transform duration-700"
-                                    sizes="(max-width: 768px) 100vw, 33vw"
-                                />
-                            </div>
+            {images.map((item, idx) => (
+                <GalleryItemComponent key={idx} item={item} />
+            ))}
+        </motion.div>
+    );
+}
+
+function GalleryItemComponent({ item }: { item: GalleryItem }) {
+    const isVideo = item.src.toLowerCase().endsWith(".mp4");
+    const [isClicked, setIsClicked] = useState(false);
+
+    // Toggle click state
+    const handleClick = () => {
+        setIsClicked(!isClicked);
+    };
+
+    return (
+        <motion.div
+            whileHover={{ y: -5, rotate: 1, scale: 1.02 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            onClick={handleClick}
+            className={cn(
+                "relative rounded-sm overflow-hidden shadow-md transition-all duration-500 w-full group cursor-pointer",
+                isClicked ? "scale-[1.02] -translate-y-1 rotate-1 shadow-2xl" : "hover:shadow-2xl"
+            )}
+        >
+            {isVideo ? (
+                <VideoItem src={item.src} />
+            ) : (
+                <div className="relative aspect-[3/4]">
+                    <Image
+                        src={item.src}
+                        alt="Memory"
+                        fill
+                        className="object-cover transition-transform duration-700"
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                    />
+                </div>
+            )}
+
+            {/* Hidden Caption Overlay */}
+            {item.caption && (
+                <div
+                    className={cn(
+                        "absolute inset-0 bg-black/40 transition-opacity duration-300 flex items-end justify-center pb-6",
+                        isClicked ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                    )}
+                >
+                    <p
+                        className={cn(
+                            "text-white/90 text-sm font-serif tracking-widest px-4 text-center transform transition-transform duration-300 delay-100",
+                            isClicked ? "translate-y-0" : "translate-y-4 group-hover:translate-y-0"
                         )}
-                    </div>
-                );
-            })}
+                    >
+                        {item.caption}
+                    </p>
+                </div>
+            )}
         </motion.div>
     );
 }

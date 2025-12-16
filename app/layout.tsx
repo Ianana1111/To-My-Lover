@@ -14,8 +14,8 @@ const notoSans = Noto_Sans_TC({
 });
 
 export const metadata: Metadata = {
-  title: "Happy Birthday Bao",
-  description: "A memory scroll for you.",
+  title: "Emergency Message",
+  description: "some emergency message",
 };
 
 export default function RootLayout({

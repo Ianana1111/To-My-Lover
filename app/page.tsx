@@ -10,46 +10,51 @@ import BackgroundMusic from "@/components/BackgroundMusic";
 
 // --- CONTENT CONSTANTS ---
 const CONTENT = {
-  INTRO_MESSAGE: "致我可愛的寶寶,\n\n雖然我平常好像都不太會說什麼浪漫的話啦，但能遇見妳我是真的很開心，希望妳有感受到～好啦，我愛妳，22 歲生日快樂歐！",
+  INTRO_MESSAGE: "致我可愛的寶寶,\n\n突然很臨時起意的做了一個小網站，想說我平常好像都不太會說什麼浪漫的話，那就做點不一樣的送給妳吧！生日快樂！啊請慢慢往下滑不要滑太快，還有記得打開聲音",
 
   GALLERY_IMAGES: [
-    "/1.jpg",
-    "/vedio1.mp4",
-    "/3.jpg",
-    "/4.jpg",
-    "/5.jpg",
-    "/video2.mp4",
-    "/6.jpg",
-    "/7.jpg",
-    "/8.jpg",
-    "/9.jpg",
-    "/video3.mp4",
-    "/10.jpg",
-    "/166326_0.jpg",
-    "/166327_0.jpg",
-    "/166328_0.jpg",
-    "/166329_0.jpg",
-    "/166330_0.jpg",
-    "/11.jpg",
-    "/12.jpg",
-    "/13.jpg",
-    "/15.jpg",
-    "/16.jpg",
-    "/video4.mp4",
-    "/17.jpg",
+    { src: "/1.jpg", caption: "謝謝寶寶送我錢包，非常非常喜歡" },
+    { src: "/vedio1.mp4" },
+    { src: "/3.jpg", caption: "情人節快樂" },
+    { src: "/4.jpg", caption: "妳笑起來真的好美" },
+    { src: "/5.jpg" },
+    { src: "/video2.mp4" },
+    { src: "/6.jpg", caption: "這天我們好像聊了不少家和的八卦吧哈哈哈" },
+    { src: "/7.jpg", caption: "真的很喜歡跟你一起出去玩" },
+    { src: "/8.jpg", caption: "這應該是我們第一次出去玩吧" },
+    { src: "/9.jpg", caption: "這到底誰家可愛寶寶啊" },
+    { src: "/video3.mp4" },
+    { src: "/10.jpg", caption: "真的很喜歡這個小吊飾，超可愛" },
+    { src: "/166326_0.jpg" },
+    { src: "/166327_0.jpg", caption: "準備要開吃了！" },
+    { src: "/166328_0.jpg" },
+    { src: "/166329_0.jpg", caption: "三和夜市絕對是最頂的" },
+    { src: "/166330_0.jpg", caption: "姆, 好吃" },
+    { src: "/11.jpg", caption: "大開殺戒" },
+    { src: "/12.jpg", caption: "明明就很好看不知道在躲什麼" },
+    { src: "/13.jpg" },
+    { src: "/15.jpg", caption: "我覺得我這張拍的很好哈哈哈" },
+    { src: "/16.jpg", caption: "超級好吃的炒手" },
+    { src: "/video4.mp4" },
+    { src: "/17.jpg" },
   ],
 
   NARRATIVE_1: "雖然也才短短幾個月，但總覺得已經跟妳過了大概有一年這麽久了吧，到現在還是覺得很神奇",
 
   NARRATIVE_2: "真的很喜歡妳的笑容，拜託每天都對我笑，真的",
 
-  OUTRO_MESSAGE: "大概就醬子八，希望妳有看的開心哈哈哈。不得不說，幾個月前的我根本也沒想過世界會變這樣吧，甚至說一晃眼我們也交往快半年了，吃了好多也玩好多，也很慶幸身邊的人是妳，很喜歡妳的一切，喜歡妳的理性、開朗、活潑、笑容和可愛，也很喜歡跟妳坐在星空底下談天說地，每次聊天完都覺得又更了解妳，也更能知道該怎麼好好的愛妳了。\
-  希望妳接下來的日子，都能過的開心順利，就算有遇到什麼難過的事也都能好好撐過去，有需要的話我都在妳旁邊，雖然不太會講話但如果我的陪伴能讓妳感到舒服那就請好好的壓榨我吧哈哈。最後，很感謝妳願意包容我這個很會忘東忘西的小白癡，我不會讓妳失望的。\n\n生日快樂寶貝！"
+  OUTRO_MESSAGE: "恭喜妳滑到底啦，希望妳有看的開心哈哈哈。不得不說，幾個月前的我根本也沒想過世界會變這樣吧，甚至說一晃眼我們也交往快半年了，吃了好多也玩好多，也很慶幸身邊的人是妳，很喜歡妳的一切，喜歡妳的理性、開朗、活潑、笑容和可愛，也很喜歡跟妳坐在星空底下談天說地，每次聊天完都覺得又更了解妳，也更能知道該怎麼好好的愛妳了。",
+  OUTRO_MESSAGE_2: "希望妳接下來的日子，都能過的開心順利，就算有遇到什麼難過的事也都能好好撐過去，有需要的話我都在妳身邊，雖然不太會講話但如果我的陪伴能讓妳感到舒服那就請好好的壓榨我吧哈哈。最後，很感謝妳願意包容我這個很會忘東忘西、常常搞不清楚狀況的小白癡，希望未來我能把自己弄的更好，讓妳不會一直擔心，不然我可能也會先被妳打死哈哈哈。\n\n好啦！就這樣，生日快樂寶貝，我愛妳"
 };
 
 import MobileWarning from "@/components/MobileWarning";
 
+import { useState } from "react";
+// ... imports
+
 export default function Home() {
+  const [startMusic, setStartMusic] = useState(false);
+
   return (
     <>
       <MobileWarning />
@@ -62,7 +67,10 @@ export default function Home() {
             <Hero />
 
             {/* 2. Intro Card */}
-            <IntroCard message={CONTENT.INTRO_MESSAGE} />
+            <IntroCard
+              message={CONTENT.INTRO_MESSAGE}
+              onOpen={() => setStartMusic(true)}
+            />
 
             {/* 3. Gallery Part 1 */}
             <ParallaxGallery
@@ -89,9 +97,12 @@ export default function Home() {
             />
 
             {/* 8. Outro */}
-            <Outro message={CONTENT.OUTRO_MESSAGE} />
+            <Outro
+              message={CONTENT.OUTRO_MESSAGE}
+              message2={CONTENT.OUTRO_MESSAGE_2}
+            />
 
-            <BackgroundMusic />
+            <BackgroundMusic shouldPlay={startMusic} />
           </main>
         </SmoothScroll>
       </div>
